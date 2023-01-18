@@ -9,13 +9,17 @@ import 'package:season_sure/app/data/models/current_weather_model.dart';
 class HomeController extends GetxController {
   final count = 0.obs;
   d.Dio dio = d.Dio();
-  CurrentWeatherModel? currentWeather;
+  final isLoading = false.obs;
+  Rxn<CurrentWeatherModel> currentWeather = Rxn<CurrentWeatherModel>();
   Position? currentPosition;
 
   @override
   void onInit() async {
     super.onInit();
+    isLoading.value = true;
     await fetchData();
+    Future.delayed(const Duration(seconds: 1));
+    isLoading.value = false;
   }
 
   @override
@@ -39,10 +43,10 @@ class HomeController extends GetxController {
       log("Latitude is $lat");
       log("Longitude is $long");
       final d.Response response = await dio.get(
-          "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey");
+          "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey&units=metric");
       print(response);
-      currentWeather = CurrentWeatherModel.fromJson(response.data);
-      log("current temp is ${currentWeather?.main?.temp}");
+      currentWeather.value = CurrentWeatherModel.fromJson(response.data);
+      log("current temp is ${currentWeather.value?.main?.temp}");
     } catch (e) {
       print(e);
       Get.snackbar(
