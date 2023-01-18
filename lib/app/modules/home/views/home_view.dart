@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +21,7 @@ class HomeView extends GetView<HomeController> {
         backgroundColor: backgroundColor,
         body: Obx(
           () {
-            if (controller.isLoading.value == true) {
+            if (controller.isLoading.value == true || controller.plot == null) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
@@ -43,7 +44,7 @@ class HomeView extends GetView<HomeController> {
                 slivers: [
                   SliverAppBar(
                     backgroundColor: backgroundColor,
-                    expandedHeight: 150.0,
+                    // expandedHeight: 150.0,
                     floating: true,
                     pinned: true,
                     snap: false,
@@ -52,10 +53,10 @@ class HomeView extends GetView<HomeController> {
                       'SeasonSure',
                       style: GoogleFonts.montserrat().copyWith(fontSize: 25),
                     ),
-                    flexibleSpace: const FlexibleSpaceBar(
-                      centerTitle: true,
-                      title: SearchWidget(),
-                    ),
+                    // flexibleSpace: const FlexibleSpaceBar(
+                    //   centerTitle: true,
+                    //   title: SearchWidget(),
+                    // ),
                   ),
                   WeatherWidget(
                       date: date,
@@ -254,6 +255,65 @@ class HomeView extends GetView<HomeController> {
                         ),
                       ),
                     ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        bottom: 20,
+                        right: 20,
+                      ),
+                      child: Text(
+                        "Tidal Plot of the day",
+                        style: GoogleFonts.montserrat().copyWith(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 20.0, right: 20, bottom: 20),
+                      child: Image.memory(
+                        const Base64Decoder().convert(controller.plot!),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        bottom: 20,
+                        right: 20,
+                      ),
+                      child: Text(
+                        "Ports near you",
+                        style: GoogleFonts.montserrat().copyWith(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: ListView.builder(
+                        itemCount:
+                            controller.stationModel.value!.stations!.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final cur =
+                              controller.stationModel.value!.stations![index];
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              left: 20,
+                              right: 20,
+                              bottom: 10,
+                            ),
+                            child: Text(cur!.name!),
+                          );
+                        }),
                   )
                 ],
               );
@@ -305,6 +365,7 @@ class WeatherWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(getWeatherIconUrl(iconId ?? "10d"));
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -359,7 +420,7 @@ class WeatherWidget extends StatelessWidget {
                     width: 20,
                   ),
                   Image.network(
-                    getWeatherIconUrl(iconId!),
+                    getWeatherIconUrl(iconId ?? "10d"),
                   )
                 ],
               ),
