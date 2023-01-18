@@ -4,6 +4,7 @@ import 'package:dio/dio.dart' as d;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:season_sure/app/data/models/aqi_model.dart';
 import 'package:season_sure/app/data/models/current_weather_model.dart';
 
 class HomeController extends GetxController {
@@ -12,6 +13,7 @@ class HomeController extends GetxController {
   final isLoading = false.obs;
   Rxn<CurrentWeatherModel> currentWeather = Rxn<CurrentWeatherModel>();
   Position? currentPosition;
+  Rxn<AqiModel> aqi = Rxn<AqiModel>();
 
   @override
   void onInit() async {
@@ -46,6 +48,14 @@ class HomeController extends GetxController {
       currentWeather.value = CurrentWeatherModel.fromJson(response.data);
       log("current temp is ${currentWeather.value?.main?.temp}");
       isLoading.value = false;
+      int timeNow = DateTime.now().toUtc().microsecondsSinceEpoch;
+      print(timeNow);
+      log("Getting aqi details");
+      d.Response res = await dio.get(
+          "http://api.openweathermap.org/data/2.5/air_pollution/forecast?lat=$lat&lon=$long&appid=$apiKey");
+      aqi.value = AqiModel.fromJson(res.data);
+      print(aqi.value?.list?.first?.main?.aqi);
+      print(aqi.value?.list?.first?.components?['co']);
     } catch (e) {
       print(e);
       Get.snackbar(
