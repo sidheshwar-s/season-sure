@@ -16,10 +16,7 @@ class HomeController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    isLoading.value = true;
     await fetchData();
-    Future.delayed(const Duration(seconds: 1));
-    isLoading.value = false;
   }
 
   @override
@@ -35,6 +32,7 @@ class HomeController extends GetxController {
   void increment() => count.value++;
 
   Future<void> fetchData() async {
+    isLoading.value = true;
     try {
       currentPosition = await getCurrentPosition();
       const apiKey = "18fe13cbd4c615fb741b2b8800412029";
@@ -44,9 +42,10 @@ class HomeController extends GetxController {
       log("Longitude is $long");
       final d.Response response = await dio.get(
           "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey&units=metric");
-      print(response);
+
       currentWeather.value = CurrentWeatherModel.fromJson(response.data);
       log("current temp is ${currentWeather.value?.main?.temp}");
+      isLoading.value = false;
     } catch (e) {
       print(e);
       Get.snackbar(

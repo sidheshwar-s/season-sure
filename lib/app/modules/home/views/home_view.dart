@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:season_sure/app/data/constants.dart';
 import 'package:season_sure/app/data/models/current_weather_model.dart';
+import 'package:season_sure/app/data/weather_data.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -24,8 +26,16 @@ class HomeView extends GetView<HomeController> {
             } else {
               CurrentWeatherModel? currentWeatherModel =
                   controller.currentWeather.value;
+              String? desc =
+                  controller.currentWeather.value?.weather?.first?.description;
+              String? iconId =
+                  controller.currentWeather.value?.weather?.first?.icon;
+              String? city = controller.currentWeather.value?.name;
+              String? country = controller.currentWeather.value?.sys?.country;
+              double? low = controller.currentWeather.value?.main?.tempMin;
+              double? high = controller.currentWeather.value?.main?.tempMax;
               return CustomScrollView(slivers: [
-                const SliverAppBar(
+                SliverAppBar(
                   backgroundColor: backgroundColor,
                   expandedHeight: 150.0,
                   floating: true,
@@ -34,9 +44,9 @@ class HomeView extends GetView<HomeController> {
                   centerTitle: true,
                   title: Text(
                     'SeasonSure',
-                    style: TextStyle(fontSize: 25),
+                    style: GoogleFonts.montserrat().copyWith(fontSize: 25),
                   ),
-                  flexibleSpace: FlexibleSpaceBar(
+                  flexibleSpace: const FlexibleSpaceBar(
                     centerTitle: true,
                     title: SearchWidget(),
                   ),
@@ -51,7 +61,8 @@ class HomeView extends GetView<HomeController> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: DefaultTextStyle(
-                        style: const TextStyle(color: Colors.white),
+                        style: GoogleFonts.montserrat()
+                            .copyWith(color: Colors.white),
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -75,38 +86,56 @@ class HomeView extends GetView<HomeController> {
                                 height: 5,
                               ),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     "${currentWeatherModel?.main?.temp}",
                                     style: const TextStyle(fontSize: 70),
                                   ),
-                                  const Text(
-                                    "°C",
-                                    style: TextStyle(
-                                        color: accentColor, fontSize: 25),
+                                  const SizedBox(
+                                    width: 5,
                                   ),
-                                  const Spacer(),
-                                  const Icon(
-                                    Icons.web_asset,
-                                    size: 100,
+                                  const Padding(
+                                    padding: EdgeInsets.only(top: 10.0),
+                                    child: Text(
+                                      "°C",
+                                      style: TextStyle(
+                                          color: accentColor, fontSize: 25),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  Image.network(
+                                    getWeatherIconUrl(iconId!),
                                   )
                                 ],
                               ),
-                              const Text(
-                                  "The loction is in Chennai and let us have fun"),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "$desc",
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  Text("$high° / $low°")
+                                ],
+                              ),
                               const SizedBox(
                                 height: 10,
                               ),
                               Row(
-                                children: const [
-                                  Icon(
-                                    Icons.add_location,
-                                    color: Colors.white,
+                                children: [
+                                  const Icon(
+                                    Icons.location_on_outlined,
+                                    color: accentColor,
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 10,
                                   ),
-                                  Text("Chennai,TamilNadu"),
+                                  Text("$city, $country"),
                                 ],
                               )
                             ]),
@@ -131,12 +160,15 @@ class SearchWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: TextField(
         decoration: InputDecoration(
           fillColor: foregroundColor,
           filled: true,
-          hintStyle: const TextStyle(color: Colors.white, fontSize: 13),
+          hintStyle: GoogleFonts.montserrat().copyWith(
+            color: Colors.white,
+            fontSize: 13,
+          ),
           hintText: 'Search Your Location',
           suffixIcon: const Icon(
             Icons.location_city,
