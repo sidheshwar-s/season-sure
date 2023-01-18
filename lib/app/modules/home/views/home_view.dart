@@ -87,13 +87,13 @@ class HomeView extends GetView<HomeController> {
                                 const Text(
                                   "Air Quality Index",
                                   style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 20,
+                                      color: accentColor,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   " - ${getAqiTag(aqiModel?.list?.first?.main?.aqi)}",
                                   style: const TextStyle(
-                                      color: accentColor,
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 )
@@ -266,7 +266,7 @@ class HomeView extends GetView<HomeController> {
                       child: Text(
                         "Tidal Plot of the day",
                         style: GoogleFonts.montserrat().copyWith(
-                            color: Colors.white,
+                            color: accentColor,
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
@@ -289,9 +289,9 @@ class HomeView extends GetView<HomeController> {
                         right: 20,
                       ),
                       child: Text(
-                        "Ports near you",
+                        "Ports near you (100 km radius)",
                         style: GoogleFonts.montserrat().copyWith(
-                            color: Colors.white,
+                            color: accentColor,
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
@@ -299,22 +299,228 @@ class HomeView extends GetView<HomeController> {
                   ),
                   SliverToBoxAdapter(
                     child: ListView.builder(
-                        itemCount:
-                            controller.stationModel.value!.stations!.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final cur =
-                              controller.stationModel.value!.stations![index];
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                              left: 20,
-                              right: 20,
-                              bottom: 10,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount:
+                          controller.stationModel.value!.stations!.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final cur =
+                            controller.stationModel.value!.stations![index];
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            left: 20,
+                            right: 20,
+                            bottom: 10,
+                          ),
+                          child: Text(
+                            "• ${cur!.name!}",
+                            style: GoogleFonts.montserrat().copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
                             ),
-                            child: Text(cur!.name!),
-                          );
-                        }),
-                  )
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        top: 10,
+                        bottom: 0,
+                        right: 20,
+                      ),
+                      child: Text(
+                        "Safe Place near you (10km)",
+                        style: GoogleFonts.montserrat().copyWith(
+                            color: accentColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 20.0,
+                        top: 10,
+                        bottom: 20,
+                        right: 20,
+                      ),
+                      child: Text(
+                        "Note: Lower the safety score better the place is",
+                        style: GoogleFonts.montserrat().copyWith(
+                          color: Colors.white54,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: DefaultTextStyle(
+                      style: GoogleFonts.montserrat().copyWith(
+                        color: Colors.white,
+                      ),
+                      child: Container(
+                        height: 240,
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: controller
+                              .safetyLocationModel.value!.data!.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final cur = controller
+                                .safetyLocationModel.value!.data![index];
+                            return DefaultTextStyle(
+                              style: GoogleFonts.montserrat()
+                                  .copyWith(color: Colors.white),
+                              child: Card(
+                                color: foregroundColor,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: DefaultTextStyle(
+                                    style: GoogleFonts.montserrat()
+                                        .copyWith(color: Colors.white),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${cur?.name}",
+                                          style:
+                                              GoogleFonts.montserrat().copyWith(
+                                            color: accentColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        const Text(
+                                          "Safety Scores",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const SizedBox(
+                                          height: 8,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text("LGBTQ - "),
+                                            Text(
+                                              "${cur!.safetyScores!.lgbtq}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Medical - "),
+                                            Text(
+                                              "${cur.safetyScores!.medical}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Overall - "),
+                                            Text(
+                                              "${cur.safetyScores!.overall}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Physical harm - "),
+                                            Text(
+                                              "${cur.safetyScores!.physicalHarm}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Political freedom - "),
+                                            Text(
+                                              "${cur.safetyScores!.politicalFreedom}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Theft - "),
+                                            Text(
+                                              "${cur.safetyScores!.theft}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text("Women - "),
+                                            Text(
+                                              "${cur.safetyScores!.women}",
+                                              style: const TextStyle(
+                                                color: accentColor,
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SliverPadding(padding: EdgeInsets.all(20)),
                 ],
               );
             }

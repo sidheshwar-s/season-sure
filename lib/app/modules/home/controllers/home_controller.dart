@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:season_sure/app/data/models/aqi_model.dart';
 import 'package:season_sure/app/data/models/current_weather_model.dart';
+import 'package:season_sure/app/data/models/safety_location_model.dart';
 import 'package:season_sure/app/data/models/station_model.dart';
 
 class HomeController extends GetxController {
@@ -13,6 +14,7 @@ class HomeController extends GetxController {
   final isLoading = false.obs;
   Rxn<CurrentWeatherModel> currentWeather = Rxn<CurrentWeatherModel>();
   Rxn<StationsModel> stationModel = Rxn<StationsModel>();
+  Rxn<SafetyLocationModel> safetyLocationModel = Rxn<SafetyLocationModel>();
   Position? currentPosition;
   Rxn<AqiModel> aqi = Rxn<AqiModel>();
   String? accessToken;
@@ -70,7 +72,7 @@ class HomeController extends GetxController {
       plot = arr?[1];
 
       d.Response stationResponse = await dio.get(
-        "https://www.worldtides.info/api/v3?stations&lat=$lat&lon=$long&stationDistance=50&key=3b2e5d17-2db7-4afb-b703-36f84bd211c5",
+        "https://www.worldtides.info/api/v3?stations&lat=$lat&lon=$long&stationDistance=10&key=3b2e5d17-2db7-4afb-b703-36f84bd211c5",
       );
 
       stationModel.value = StationsModel.fromJson(stationResponse.data);
@@ -104,12 +106,14 @@ class HomeController extends GetxController {
   getSafetyDetails(double lat, double long) async {
     d.Dio dio = d.Dio();
     d.Response response = await dio.get(
-      "https://test.api.amadeus.com/v1/safety/safety-rated-locations?latitude=$lat&longitude=$long&radius=1&page%5Blimit%5D=10&page%5Boffset%5D=0",
+      "https://test.api.amadeus.com/v1/safety/safety-rated-locations?latitude=41.397158&longitude=2.160873&radius=1&page%5Blimit%5D=10&page%5Boffset%5D=0",
       options: d.Options(headers: {
         "Authorization": "Bearer $accessToken",
       }),
     );
-    print(response.data);
+
+    safetyLocationModel.value =
+        await SafetyLocationModel.fromJson(response.data);
   }
 }
 
